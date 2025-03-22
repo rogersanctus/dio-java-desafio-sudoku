@@ -1,0 +1,53 @@
+plugins {
+  id 'java'
+  id 'application'
+  id 'eclipse'
+}
+
+group = 'me.rogerioferreira.sudoku'
+version = '0.0.1'
+
+repositories {
+  mavenCentral()
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
+}
+
+ext {
+  gdxVersion = '1.13.1'
+}
+
+dependencies {
+  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_22
+  targetCompatibility = JavaVersion.VERSION_22
+}
+
+application {
+  mainClass = 'me.rogerioferreira.sudoku.Aplication'
+}
+
+tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+}
+
+run {
+  workingDir = rootDir
+  ignoreExitValue = true
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src']
+    }
+    resources {
+      srcDirs = ['assets']
+    }
+  }
+}

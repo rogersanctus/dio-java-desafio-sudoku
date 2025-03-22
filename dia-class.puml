@@ -1,0 +1,65 @@
+@startuml
+enum GameStatus {
+  + UNSTARTED("não iniciado")
+  + INCOMPLETE("incompleto")
+  + COMPLETE("completo")
+
+  - String description
+
+  + GameStatus(String description)
+}
+
+class Game {
+  - GameStatus status
+  - Board board
+}
+
+class Board {
+  - {static} int DEFAULT_SIZE = 9
+  - int size
+  - int regionSize
+  - List<List<space>> spaces
+
+  + Board(int size)
+  + assignSpace(boolean isInitial, Point point, int value)
+  - List<Space> getNeighborLineSpaces(Point point)
+  - List<Space> getNeighborColumnSpaces(Point point)
+  - List<Space> getNeighborRegionSpaces(Point point)
+  - int computeRegionSize()
+  - void computeSpacesCandidates(List<Space> spaces)
+  - void validate()
+}
+
+class Point {
+  - int x
+  - int y
+
+  + Point(int x, int y)
+}
+
+class Space {
+  - Point point
+  - boolean isFixed
+  - boolean isValidValue
+  - int value
+  - List<int> candidates
+}
+
+Game .. GameStatus
+Game "1" -down-* "1" Board
+Board "1" --* "*" Space
+Space .left. Point
+
+note left of Board::computeRegionSize
+Retorna o tamanho (linhas ou colunas)
+de uma região para um tabuleiro com
+"size" de tamanho.
+end note
+
+note right of Space::point
+Quando percorremos o stream de espaços,
+precisaremos verificar a coordenada
+de cada espaço para realizar as buscas
+end note
+
+@enduml
