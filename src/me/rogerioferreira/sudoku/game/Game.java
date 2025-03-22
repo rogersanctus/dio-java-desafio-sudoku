@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import me.rogerioferreira.sudoku.Point;
+import me.rogerioferreira.sudoku.events.EventMediator;
+import me.rogerioferreira.sudoku.game.screens.StartScreen;
 
 public class Game extends com.badlogic.gdx.Game {
   private GameStatus status = GameStatus.UNSTARTED;
@@ -19,10 +21,16 @@ public class Game extends com.badlogic.gdx.Game {
   private static final int SPACE_SIZE = 88;
   private int offset = 0;
 
-  private OrthographicCamera camera;
-  private ShapeRenderer shapeRenderer;
-  private SpriteBatch batch;
-  private BitmapFont font;
+  public OrthographicCamera camera;
+  public ShapeRenderer shapeRenderer;
+  public SpriteBatch batch;
+  public BitmapFont font;
+
+  private EventMediator eventMediator = new EventMediator();
+
+  private StartScreen startScreen;
+  // private RunningScreen runningScreen;
+  // private GameCompletedScreen gameCompletedScreen;
 
   public Game() {
     System.out.println("Game created!");
@@ -30,6 +38,7 @@ public class Game extends com.badlogic.gdx.Game {
 
     this.offset = GAME_SCREEN_SIZE - SPACE_SIZE * this.board.getSize();
     this.offset /= 2;
+
   }
 
   private void renderBoard() {
@@ -128,13 +137,14 @@ public class Game extends com.badlogic.gdx.Game {
   public void create() {
     System.out.println("Game started!");
 
-    for (int y = 0, numOffset = 1; y < this.board.getSize(); y++) {
-      for (int x = 0; x < this.board.getSize(); x++) {
-        board.assignSpace(false, new Point(x, y), numOffset % (this.board.getSize() + 1));
-        numOffset++;
-      }
-      numOffset = y + 2;
-    }
+    // for (int y = 0, numOffset = 1; y < this.board.getSize(); y++) {
+    // for (int x = 0; x < this.board.getSize(); x++) {
+    // board.assignSpace(false, new Point(x, y), numOffset % (this.board.getSize() +
+    // 1));
+    // numOffset++;
+    // }
+    // numOffset = y + 2;
+    // }
 
     this.camera = new OrthographicCamera();
     this.camera.setToOrtho(true);
@@ -147,6 +157,9 @@ public class Game extends com.badlogic.gdx.Game {
     font.setUseIntegerPositions(false);
     font.getRegion().getTexture().setFilter(TextureFilter.Nearest,
         TextureFilter.Nearest);
+
+    this.startScreen = new StartScreen(this, this.eventMediator);
+    this.setScreen(this.startScreen);
 
   }
 
@@ -161,20 +174,20 @@ public class Game extends com.badlogic.gdx.Game {
     this.batch.setProjectionMatrix(this.camera.combined);
     this.shapeRenderer.setProjectionMatrix(this.camera.combined);
 
-    this.renderBoard();
-
-    switch (this.status) {
-      case GameStatus.INCOMPLETED:
-        renderRunningScreen();
-        break;
-      case GameStatus.COMPLETED:
-        renderGameCompletedScreen();
-        break;
-      case GameStatus.UNSTARTED:
-      default:
-        renderStartScreen();
-        break;
-    }
+    // this.renderBoard();
+    //
+    // switch (this.status) {
+    // case GameStatus.INCOMPLETED:
+    // renderRunningScreen();
+    // break;
+    // case GameStatus.COMPLETED:
+    // renderGameCompletedScreen();
+    // break;
+    // case GameStatus.UNSTARTED:
+    // default:
+    // renderStartScreen();
+    // break;
+    // }
   }
 
   @Override
@@ -184,5 +197,6 @@ public class Game extends com.badlogic.gdx.Game {
     this.shapeRenderer.dispose();
     this.font.dispose();
     this.batch.dispose();
+    this.startScreen.dispose();
   }
 }
