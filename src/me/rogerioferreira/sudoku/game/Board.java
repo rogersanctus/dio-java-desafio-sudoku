@@ -9,18 +9,32 @@ public class Board {
   static final int DEFAULT_SIZE = 9;
   private int size;
   int regionSize;
+  int totalSpaces;
+  int totalAssignments = 0;
 
   private List<List<Space>> spaces;
 
   public Board(int size) {
     this.size = size;
     this.regionSize = this.computeRegionSize();
+    this.totalSpaces = this.size * this.size;
 
     this.createSpaces();
   }
 
   private int computeRegionSize() {
     return (int) Math.sqrt(size);
+  }
+
+  public SpaceRegion computeRegion(Point point) {
+    var regionX = (int) (point.x() / this.regionSize);
+    var regionY = (int) (point.y() / this.regionSize);
+
+    return new SpaceRegion(regionX, regionY);
+  }
+
+  public boolean isBoardComplete() {
+    return this.totalAssignments == this.totalSpaces && !this.hasInvalidAssignments();
   }
 
   private void createSpaces() {
@@ -30,17 +44,139 @@ public class Board {
       this.spaces.add(new ArrayList<>(this.size));
 
       for (int j = 0; j < this.size; j++) {
-        this.spaces.get(i).add(new Space());
+        var space = new Space();
+        space.region = this.computeRegion(new Point(i, j));
+        this.spaces.get(i).add(space);
       }
     }
   }
 
-  public void assignSpace(boolean isInitial, Point point, int value) {
+  private boolean hasInvalidAssignments() {
+    return this.spaces
+        .stream()
+        .flatMap(columnSpaces -> columnSpaces.stream())
+        .anyMatch(space -> !space.getIsValid());
+
+  }
+
+  public Space assignSpace(boolean isInitial, Point point, int value) {
     var column = this.spaces.get(point.x());
     var space = column.get(point.y());
+    var oldValue = space.value;
 
     space.isFixed = isInitial;
     space.value = value;
+
+    if (oldValue != null && oldValue != value) {
+      this.revalidateLineValue(point, oldValue);
+      this.revalidateColumnValue(point, oldValue);
+    }
+
+    this.validateMove(space, point, value);
+
+    return space;
+  }
+
+  // Run all the line making revalidations on values with same value that are
+  // invalid
+  private void revalidateLineValue(Point selfPoint, int value) {
+    for (int x = 0; x < this.size; x++) {
+      if (x == selfPoint.x()) {
+        continue;
+      }
+
+      var space = this.spaces.get(x).get(selfPoint.y());
+
+      if (space.value == value && !space.isValid) {
+        var hasColumnDuplicate = this.spaces.get(x)
+            .stream()
+            .filter(columnSpace -> columnSpace.value == value)
+            .count() > 1;
+
+        var region = this.computeRegion(new Point(x, selfPoint.y()));
+
+        // Do not validate region if it is invalid already
+        var hasRegionDuplicate = hasColumnDuplicate || this.spaces
+            .stream()
+            .flatMap(columnSpaces -> columnSpaces.stream())
+            .filter(regionSpace -> regionSpace.region.x() == region.x() && regionSpace.region.y() == region.y())
+            .filter(regionSpace -> regionSpace.value == value)
+            .count() > 1;
+
+        space.isValid = !hasColumnDuplicate && !hasRegionDuplicate;
+      }
+    }
+  }
+
+  private void revalidateColumnValue(Point selfPoint, int value) {
+    for (int y = 0; y < this.size; y++) {
+      if (y == selfPoint.y()) {
+        continue;
+      }
+
+      var space = this.spaces.get(selfPoint.x()).get(y);
+
+      if (space.value == value && !space.isValid) {
+        var hasColumnDuplicate = this.spaces.get(selfPoint.x())
+            .stream()
+            .filter(lineSpace -> lineSpace.value == value)
+            .count() > 1;
+
+        var region = this.computeRegion(new Point(selfPoint.x(), y));
+
+        var hasRegionDuplicate = hasColumnDuplicate || this.spaces
+            .stream()
+            .flatMap(columnSpaces -> columnSpaces.stream())
+            .filter(regionSpace -> regionSpace.region.x() == region.x() && regionSpace.region.y() == region.y())
+            .filter(regionSpace -> regionSpace.value == value)
+            .count() > 1;
+
+        space.isValid = !hasColumnDuplicate && !hasRegionDuplicate;
+      }
+    }
+  }
+
+  public void validateMove(Space spaceAssigned, Point point, int value) {
+    // validate column
+    for (int x = 0; x < this.size; x++) {
+      if (x == point.x()) {
+        continue;
+      }
+
+      var space = this.spaces.get(x).get(point.y());
+
+      if (space.value == value) {
+        spaceAssigned.isValid = space.isValid = false;
+      }
+    }
+
+    // validate row
+    for (int y = 0; y < this.size; y++) {
+      if (y == point.y()) {
+        continue;
+      }
+
+      var space = this.spaces.get(point.x()).get(y);
+
+      if (space.value == value) {
+        spaceAssigned.isValid = space.isValid = false;
+      }
+    }
+
+    // validate region
+    var region = this.computeRegion(point);
+
+    this.spaces
+        .stream()
+        .flatMap(columnSpaces -> {
+          return columnSpaces
+              .stream()
+              .filter(columnSpace -> columnSpace.region.x() == region.x() && columnSpace.region.y() == region.y())
+              .filter(columnSpace -> columnSpace.value == value);
+        })
+        .forEach(columnSpace -> {
+          spaceAssigned.isValid = columnSpace.isValid = false;
+        });
   }
 
   public int getSize() {
