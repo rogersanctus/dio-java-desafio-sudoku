@@ -27,14 +27,19 @@ public class Game extends com.badlogic.gdx.Game {
   public SpriteBatch batch;
   public BitmapFont font;
 
+  private GameState gameState;
+
   private EventMediator eventMediator = new EventMediator();
+  private BoardLogic boardLogic;
 
   private StartScreen startScreen;
   private FixedSpaceAssignmentScreen fixedSpaceAssignmentScreen;
 
   public Game() {
     System.out.println("Game created!");
+
     this.board = new Board(Board.DEFAULT_SIZE);
+    this.boardLogic = new BoardLogic(this, this.board, this.eventMediator);
 
     this.eventMediator.addEventListener(event -> {
       switch (event) {
@@ -48,6 +53,8 @@ public class Game extends com.badlogic.gdx.Game {
   }
 
   private void handleGameTransition(GameState gameState) {
+    this.gameState = gameState;
+
     switch (gameState) {
       case GameState.START -> {
         this.setScreen(this.startScreen);
@@ -58,6 +65,10 @@ public class Game extends com.badlogic.gdx.Game {
       default -> {
       }
     }
+  }
+
+  public GameState getGameState() {
+    return this.gameState;
   }
 
   @Override
@@ -71,7 +82,7 @@ public class Game extends com.badlogic.gdx.Game {
     this.font = new BitmapFont();
 
     font.setColor(0, 0, 0, 1);
-    font.getData().setScale(3f, -3f);
+    font.getData().setScale(3f, 3f);
     font.setUseIntegerPositions(false);
     font.getRegion().getTexture().setFilter(TextureFilter.Nearest,
         TextureFilter.Nearest);
@@ -79,8 +90,7 @@ public class Game extends com.badlogic.gdx.Game {
     this.startScreen = new StartScreen(this, this.eventMediator);
     this.fixedSpaceAssignmentScreen = new FixedSpaceAssignmentScreen(this, this.board, this.eventMediator);
 
-    this.setScreen(this.startScreen);
-
+    eventMediator.fireEvent(new GameTransitionEvent(GameState.START));
   }
 
   @Override
