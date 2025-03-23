@@ -87,10 +87,10 @@ public class Board {
 
       var space = this.spaces.get(x).get(selfPoint.y());
 
-      if (space.value == value && !space.isValid) {
+      if (space.value != null && space.value == value && !space.isValid) {
         var hasColumnDuplicate = this.spaces.get(x)
             .stream()
-            .filter(columnSpace -> columnSpace.value == value)
+            .filter(columnSpace -> columnSpace.value != null && columnSpace.value == value)
             .count() > 1;
 
         var region = this.computeRegion(new Point(x, selfPoint.y()));
@@ -100,7 +100,7 @@ public class Board {
             .stream()
             .flatMap(columnSpaces -> columnSpaces.stream())
             .filter(regionSpace -> regionSpace.region.x() == region.x() && regionSpace.region.y() == region.y())
-            .filter(regionSpace -> regionSpace.value == value)
+            .filter(regionSpace -> regionSpace.value != null && regionSpace.value == value)
             .count() > 1;
 
         space.isValid = !hasColumnDuplicate && !hasRegionDuplicate;
@@ -116,10 +116,10 @@ public class Board {
 
       var space = this.spaces.get(selfPoint.x()).get(y);
 
-      if (space.value == value && !space.isValid) {
+      if (space.value != null && space.value == value && !space.isValid) {
         var hasColumnDuplicate = this.spaces.get(selfPoint.x())
             .stream()
-            .filter(lineSpace -> lineSpace.value == value)
+            .filter(lineSpace -> lineSpace.value != null && lineSpace.value == value)
             .count() > 1;
 
         var region = this.computeRegion(new Point(selfPoint.x(), y));
@@ -128,7 +128,7 @@ public class Board {
             .stream()
             .flatMap(columnSpaces -> columnSpaces.stream())
             .filter(regionSpace -> regionSpace.region.x() == region.x() && regionSpace.region.y() == region.y())
-            .filter(regionSpace -> regionSpace.value == value)
+            .filter(regionSpace -> regionSpace.value != null && regionSpace.value == value)
             .count() > 1;
 
         space.isValid = !hasColumnDuplicate && !hasRegionDuplicate;
@@ -145,7 +145,7 @@ public class Board {
 
       var space = this.spaces.get(x).get(point.y());
 
-      if (space.value == value) {
+      if (space.value != null && space.value == value) {
         spaceAssigned.isValid = space.isValid = false;
       }
     }
@@ -158,7 +158,7 @@ public class Board {
 
       var space = this.spaces.get(point.x()).get(y);
 
-      if (space.value == value) {
+      if (space.value != null && space.value == value) {
         spaceAssigned.isValid = space.isValid = false;
       }
     }
@@ -172,7 +172,7 @@ public class Board {
           return columnSpaces
               .stream()
               .filter(columnSpace -> columnSpace.region.x() == region.x() && columnSpace.region.y() == region.y())
-              .filter(columnSpace -> columnSpace.value == value);
+              .filter(columnSpace -> columnSpace.value != null && columnSpace.value == value);
         })
         .forEach(columnSpace -> {
           spaceAssigned.isValid = columnSpace.isValid = false;
