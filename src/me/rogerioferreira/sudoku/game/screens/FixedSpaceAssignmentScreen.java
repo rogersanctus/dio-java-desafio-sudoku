@@ -1,8 +1,9 @@
 package me.rogerioferreira.sudoku.game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 
 import me.rogerioferreira.sudoku.Point;
 import me.rogerioferreira.sudoku.events.EventMediator;
+import me.rogerioferreira.sudoku.events.SpaceAssignmentEvent;
 import me.rogerioferreira.sudoku.game.Board;
 import me.rogerioferreira.sudoku.game.Game;
 
@@ -23,6 +25,10 @@ public class FixedSpaceAssignmentScreen implements Screen {
 
   private Texture boardTexture;
 
+  private int mouseXSpacePos;
+  private int mouseYSpacePos;
+  private int selectedValue;
+
   public FixedSpaceAssignmentScreen(Game game, Board board, EventMediator eventMediator) {
     this.game = game;
     this.board = board;
@@ -33,12 +39,32 @@ public class FixedSpaceAssignmentScreen implements Screen {
     this.offset /= 2;
 
     this.boardTexture = new Texture("sudoku_board.png");
+
+    Gdx.input.setInputProcessor(new InputAdapter() {
+      @Override
+      public boolean keyDown(int keycode) {
+        if (keycode >= Input.Keys.NUM_1 && keycode <= Input.Keys.NUM_9) {
+          selectedValue = keycode - Input.Keys.NUM_1 + 1;
+
+          eventMediator.fireEvent(new SpaceAssignmentEvent(new Point(mouseXSpacePos, mouseYSpacePos), selectedValue));
+
+        }
+        return true;
+      }
+    });
+
+  }
+
+  private void input() {
+    var mouseX = Gdx.input.getX();
+    var mouseY = Gdx.input.getY();
+    var spaceSize = Game.SPACE_SIZE + LINE_WIDTH; // Space size + line width
+
+    mouseXSpacePos = (int) (mouseX / spaceSize);
+    mouseYSpacePos = (int) (mouseY / spaceSize);
   }
 
   private void draw() {
-    var mouseX = Gdx.input.getX();
-    var mouseY = Gdx.input.getY();
-
     /// Draw the space values
     this.game.batch.begin();
 
@@ -54,9 +80,13 @@ public class FixedSpaceAssignmentScreen implements Screen {
           // Draw the value
           var value = space.getValue() == null ? "" : space.getValue().toString();
 
-          this.game.font.draw(this.game.batch, value, x * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f - 11,
-              y * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f + this.game.font.getCapHeight() * 0.5f);
+          var spaceX = x * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f - 11;
+          var spaceY = y * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f
+              - this.game.font.getCapHeight() * 0.5f;
 
+          var worldSpace = this.game.camera.unproject(new Vector3(spaceX, spaceY, 0));
+
+          this.game.font.draw(this.game.batch, value, worldSpace.x, worldSpace.y);
         }
       }
     }
@@ -68,8 +98,8 @@ public class FixedSpaceAssignmentScreen implements Screen {
     this.game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
     var spaceSize = Game.SPACE_SIZE + LINE_WIDTH; // Space size + line width
-    var adjustedMouseX = (int) (mouseX / spaceSize) * spaceSize + this.offset;
-    var adjustedMouseY = (int) (mouseY / spaceSize) * spaceSize + this.offset;
+    var adjustedMouseX = mouseXSpacePos * spaceSize + this.offset;
+    var adjustedMouseY = mouseYSpacePos * spaceSize + this.offset;
 
     var adjustedMouseWorldPos = this.game.camera.unproject(new Vector3(adjustedMouseX, adjustedMouseY, 0));
 
@@ -79,7 +109,6 @@ public class FixedSpaceAssignmentScreen implements Screen {
         Game.SPACE_SIZE);
 
     this.game.shapeRenderer.end();
-
   }
 
   @Override
@@ -89,6 +118,7 @@ public class FixedSpaceAssignmentScreen implements Screen {
   @Override
   public void render(float delta) {
     this.draw();
+    this.input();
   }
 
   @Override
@@ -109,5 +139,6 @@ public class FixedSpaceAssignmentScreen implements Screen {
 
   @Override
   public void dispose() {
+    boardTexture.dispose();
   }
 }
