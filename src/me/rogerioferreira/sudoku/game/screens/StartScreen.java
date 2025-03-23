@@ -54,7 +54,7 @@ public class StartScreen implements com.badlogic.gdx.Screen {
     // Start game
     if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
       if (this.optionSelected.equals("start")) {
-        this.eventMediator.fireEvent(new GameTransitionEvent(GameState.PLAYING));
+        this.eventMediator.fireEvent(new GameTransitionEvent(GameState.FIXED_SPACE_ASSIGNEMENT));
       } else {
         Gdx.app.exit();
       }

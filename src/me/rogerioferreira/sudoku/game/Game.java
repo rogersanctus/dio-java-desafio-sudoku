@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import me.rogerioferreira.sudoku.Point;
 import me.rogerioferreira.sudoku.events.EventMediator;
 import me.rogerioferreira.sudoku.events.GameTransitionEvent;
+import me.rogerioferreira.sudoku.game.screens.FixedSpaceAssignmentScreen;
 import me.rogerioferreira.sudoku.game.screens.StartScreen;
 
 public class Game extends com.badlogic.gdx.Game {
@@ -19,8 +20,7 @@ public class Game extends com.badlogic.gdx.Game {
   private Board board;
 
   public static final int GAME_SCREEN_SIZE = 800;
-  private static final int SPACE_SIZE = 88;
-  private int offset = 0;
+  public static final int SPACE_SIZE = 88;
 
   public OrthographicCamera camera;
   public ShapeRenderer shapeRenderer;
@@ -30,20 +30,16 @@ public class Game extends com.badlogic.gdx.Game {
   private EventMediator eventMediator = new EventMediator();
 
   private StartScreen startScreen;
+  private FixedSpaceAssignmentScreen fixedSpaceAssignmentScreen;
 
   public Game() {
     System.out.println("Game created!");
     this.board = new Board(Board.DEFAULT_SIZE);
 
-    this.offset = GAME_SCREEN_SIZE - SPACE_SIZE * this.board.getSize();
-    this.offset /= 2;
-
     this.eventMediator.addEventListener(event -> {
       switch (event) {
         case GameTransitionEvent transitionEvent -> {
-          if (transitionEvent.gameState() == GameState.PLAYING) {
-            System.out.println("Game started!");
-          }
+          this.handleGameTransition(transitionEvent.gameState());
         }
         default -> {
         }
@@ -51,83 +47,17 @@ public class Game extends com.badlogic.gdx.Game {
     });
   }
 
-  private void renderBoard() {
-    var mouseX = Gdx.input.getX();
-    var mouseY = Gdx.input.getY();
-
-    final var lineColor = new Color(0.4f, 0.4f, 0.4f, 1);
-    final var regionColor = new Color(0, 0.6f, 0.9f, 1);
-
-    /// Board background
-    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-    shapeRenderer.setColor(1, 1, 1, 1);
-    shapeRenderer.rect(this.offset, this.offset, GAME_SCREEN_SIZE - this.offset * 2,
-        GAME_SCREEN_SIZE - this.offset * 2);
-    shapeRenderer.end();
-
-    /// Board lines
-    shapeRenderer.begin(ShapeRenderer.ShapeType.Line); // Para contorno
-
-    for (int x = 0; x <= this.board.getSize(); x++) {
-      var xpos = x * SPACE_SIZE + this.offset;
-
-      if (x % this.board.getRegionSize() == 0) {
-        shapeRenderer.setColor(regionColor);
-
-        shapeRenderer.line(xpos - 1, this.offset, xpos - 1, GAME_SCREEN_SIZE - this.offset);
-        shapeRenderer.line(xpos + 1, this.offset, xpos + 1, GAME_SCREEN_SIZE - this.offset);
-      } else {
-        shapeRenderer.setColor(lineColor);
+  private void handleGameTransition(GameState gameState) {
+    switch (gameState) {
+      case GameState.START -> {
+        this.setScreen(this.startScreen);
       }
-
-      shapeRenderer.line(xpos, this.offset, xpos, GAME_SCREEN_SIZE - this.offset);
-    }
-
-    for (int y = 0; y <= this.board.getSize(); y++) {
-      var ypos = y * SPACE_SIZE + this.offset;
-
-      if (y % this.board.getRegionSize() == 0) {
-        shapeRenderer.setColor(regionColor);
-        shapeRenderer.line(this.offset, ypos - 1, GAME_SCREEN_SIZE - this.offset, ypos - 1);
-        shapeRenderer.line(this.offset, ypos + 1, GAME_SCREEN_SIZE - this.offset, ypos + 1);
-      } else {
-        shapeRenderer.setColor(lineColor);
+      case GameState.FIXED_SPACE_ASSIGNEMENT -> {
+        this.setScreen(this.fixedSpaceAssignmentScreen);
       }
-
-      shapeRenderer.line(this.offset, ypos, GAME_SCREEN_SIZE - this.offset, ypos);
-    }
-
-    shapeRenderer.end();
-
-    /// Draw the space values
-    this.batch.begin();
-    for (int x = 0; x < this.board.getSize(); x++) {
-      for (int y = 0; y < this.board.getSize(); y++) {
-        var space = this.board.getSpace(new Point(x, y));
-
-        if (space != null) {
-          // Draw the value
-          var value = space.getValue() == null ? "" : space.getValue().toString();
-
-          this.font.draw(this.batch, value, x * SPACE_SIZE + this.offset + SPACE_SIZE * 0.5f - 11,
-              y * SPACE_SIZE + this.offset + SPACE_SIZE * 0.5f + font.getCapHeight() * 0.5f);
-
-        }
+      default -> {
       }
     }
-    this.batch.end();
-
-    Gdx.gl.glEnable(GL20.GL_BLEND); // Enable blending for transparency
-    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-    shapeRenderer.setColor(1, 0, 0, 0.1f);
-    shapeRenderer.rect((int) (mouseX / SPACE_SIZE) * SPACE_SIZE + this.offset,
-        (int) (mouseY / SPACE_SIZE) * SPACE_SIZE + this.offset, SPACE_SIZE, SPACE_SIZE);
-
-    shapeRenderer.end();
-
   }
 
   @Override
@@ -147,6 +77,8 @@ public class Game extends com.badlogic.gdx.Game {
         TextureFilter.Nearest);
 
     this.startScreen = new StartScreen(this, this.eventMediator);
+    this.fixedSpaceAssignmentScreen = new FixedSpaceAssignmentScreen(this, this.board, this.eventMediator);
+
     this.setScreen(this.startScreen);
 
   }
