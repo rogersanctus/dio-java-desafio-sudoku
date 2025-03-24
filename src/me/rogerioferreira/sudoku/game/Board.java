@@ -82,14 +82,15 @@ public class Board {
 
   public void clearSpace(Point point) {
     var space = this.spaces.get(point.x()).get(point.y());
-
-    if (space.value != null) {
-      this.revalidateLineValue(point, space.value);
-      this.revalidateColumnValue(point, space.value);
-      this.revalidateRegion(point, space.value);
-    }
+    var oldValue = space.value;
 
     space.limpar();
+
+    if (oldValue != null) {
+      this.revalidateLineValue(point, oldValue);
+      this.revalidateColumnValue(point, oldValue);
+      this.revalidateRegion(point, oldValue);
+    }
   }
 
   // Run all the line making revalidations on values with same value that are
@@ -154,7 +155,29 @@ public class Board {
   }
 
   public void revalidateRegion(Point selfPoint, int value) {
+    var region = this.computeRegion(selfPoint);
 
+    var spacesInRegionWithSameValue = this.spaces
+        .stream()
+        .flatMap(columnSpaces -> columnSpaces.stream())
+        .filter(regionSpace -> regionSpace.region.x() == region.x() && regionSpace.region.y() == region.y())
+        .filter(regionSpace -> regionSpace.value != null && regionSpace.value == value)
+        .toList();
+
+    var duplicates = spacesInRegionWithSameValue.size();
+
+    if (duplicates == 0) {
+      return;
+    }
+
+    if (duplicates == 1) {
+      spacesInRegionWithSameValue.get(0).isValid = true;
+      return;
+    }
+
+    spacesInRegionWithSameValue
+        .stream()
+        .forEach(regionSpace -> regionSpace.isValid = false);
   }
 
   public void validateMove(Space spaceAssigned, Point point, int value) {
