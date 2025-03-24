@@ -120,8 +120,10 @@ public class Board {
       var space = this.spaces.get(selfPoint.x()).get(y);
 
       if (space.value != null && space.value == value && !space.isValid) {
-        var hasColumnDuplicate = this.spaces.get(selfPoint.x())
+        int localY = y;
+        var hasColumnDuplicate = this.spaces
             .stream()
+            .map(columnSpaces -> columnSpaces.get(localY))
             .filter(lineSpace -> lineSpace.value != null && lineSpace.value == value)
             .count() > 1;
 
