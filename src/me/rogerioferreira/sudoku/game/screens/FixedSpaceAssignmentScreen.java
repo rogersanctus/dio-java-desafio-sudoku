@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
 import me.rogerioferreira.sudoku.Point;
+import me.rogerioferreira.sudoku.events.ClearSpaceEvent;
 import me.rogerioferreira.sudoku.events.EventMediator;
 import me.rogerioferreira.sudoku.events.SpaceAssignmentEvent;
 import me.rogerioferreira.sudoku.game.Board;
@@ -49,6 +50,10 @@ public class FixedSpaceAssignmentScreen implements Screen {
 
           eventMediator.fireEvent(new SpaceAssignmentEvent(new Point(mouseXSpacePos, mouseYSpacePos), selectedValue));
 
+        }
+
+        if (keycode == Input.Keys.NUM_0) {
+          eventMediator.fireEvent(new ClearSpaceEvent(new Point(mouseXSpacePos, mouseYSpacePos)));
         }
         return true;
       }

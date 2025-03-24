@@ -1,5 +1,6 @@
 package me.rogerioferreira.sudoku.game;
 
+import me.rogerioferreira.sudoku.events.ClearSpaceEvent;
 import me.rogerioferreira.sudoku.events.Event;
 import me.rogerioferreira.sudoku.events.EventMediator;
 import me.rogerioferreira.sudoku.events.SpaceAssignmentEvent;
@@ -27,6 +28,9 @@ public class BoardLogic {
       case SpaceAssignmentEvent spaceAssignmentEvent -> {
         this.board.assignSpace(this.isInitial, spaceAssignmentEvent.point(),
             spaceAssignmentEvent.value());
+      }
+      case ClearSpaceEvent clearSpaceEvent -> {
+        this.board.clearSpace(clearSpaceEvent.point());
       }
       default -> {
       }

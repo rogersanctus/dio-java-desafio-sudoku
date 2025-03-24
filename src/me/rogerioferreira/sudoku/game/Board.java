@@ -80,6 +80,18 @@ public class Board {
     return space;
   }
 
+  public void clearSpace(Point point) {
+    var space = this.spaces.get(point.x()).get(point.y());
+
+    if (space.value != null) {
+      this.revalidateLineValue(point, space.value);
+      this.revalidateColumnValue(point, space.value);
+      this.revalidateRegion(point, space.value);
+    }
+
+    space.limpar();
+  }
+
   // Run all the line making revalidations on values with same value that are
   // invalid
   private void revalidateLineValue(Point selfPoint, int value) {
