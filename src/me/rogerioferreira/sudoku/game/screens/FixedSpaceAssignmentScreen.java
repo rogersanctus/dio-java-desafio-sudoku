@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -71,7 +72,7 @@ public class FixedSpaceAssignmentScreen implements Screen {
     /// Draw the board
     this.game.batch.draw(this.boardTexture, 0, 0, Game.GAME_SCREEN_SIZE, Game.GAME_SCREEN_SIZE);
 
-    /// Draw the values in the spaces
+    /// Draw the spaces
     for (int x = 0; x < this.board.getSize(); x++) {
       for (int y = 0; y < this.board.getSize(); y++) {
         var space = this.board.getSpace(new Point(x, y));
@@ -86,6 +87,14 @@ public class FixedSpaceAssignmentScreen implements Screen {
 
           var worldSpace = this.game.camera.unproject(new Vector3(spaceX, spaceY, 0));
 
+          // change de color if the space is not valid
+          if (space.getIsValid()) {
+            this.game.font.setColor(Color.BLACK);
+          } else {
+            this.game.font.setColor(Color.RED);
+          }
+
+          // draw values
           this.game.font.draw(this.game.batch, value, worldSpace.x, worldSpace.y);
         }
       }
