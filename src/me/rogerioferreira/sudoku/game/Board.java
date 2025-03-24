@@ -64,12 +64,15 @@ public class Board {
     var space = column.get(point.y());
     var oldValue = space.value;
 
+    space.point = point;
+    space.isValid = true;
     space.isFixed = isInitial;
     space.value = value;
 
     if (oldValue != null && oldValue != value) {
       this.revalidateLineValue(point, oldValue);
       this.revalidateColumnValue(point, oldValue);
+      this.revalidateRegion(point, oldValue);
     }
 
     this.validateMove(space, point, value);
@@ -136,6 +139,10 @@ public class Board {
     }
   }
 
+  public void revalidateRegion(Point selfPoint, int value) {
+
+  }
+
   public void validateMove(Space spaceAssigned, Point point, int value) {
     // validate column
     for (int x = 0; x < this.size; x++) {
@@ -165,17 +172,20 @@ public class Board {
 
     // validate region
     var region = this.computeRegion(point);
+    System.out.println("Region: " + region);
 
     this.spaces
         .stream()
         .flatMap(columnSpaces -> {
           return columnSpaces
               .stream()
-              .filter(columnSpace -> columnSpace.region.x() == region.x() && columnSpace.region.y() == region.y())
-              .filter(columnSpace -> columnSpace.value != null && columnSpace.value == value);
+              .filter(columnSpace -> columnSpace.point != spaceAssigned.point)
+              .filter(columnSpace -> columnSpace.region.x() == region.x() &&
+                  columnSpace.region.y() == region.y());
         })
-        .forEach(columnSpace -> {
-          spaceAssigned.isValid = columnSpace.isValid = false;
+        .filter(regionSpace -> regionSpace.value != null && regionSpace.value == value)
+        .forEach(regionSpace -> {
+          spaceAssigned.isValid = regionSpace.isValid = false;
         });
   }
 

@@ -3,10 +3,13 @@ package me.rogerioferreira.sudoku.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.rogerioferreira.sudoku.Point;
+
 public class Space {
   boolean isFixed = false;
   boolean isValid = true;
   Integer value = null;
+  Point point;
   SpaceRegion region;
 
   private List<Integer> candidateValues = new ArrayList<>();
