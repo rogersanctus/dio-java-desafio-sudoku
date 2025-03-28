@@ -17,6 +17,7 @@ public class BoardDrawer {
   private EventMediator eventMediator;
 
   private Texture boardTexture;
+  private NumberDrawer numberDrawer;
   private int offset = 0;
   private final int LINE_WIDTH = 1;
 
@@ -37,6 +38,7 @@ public class BoardDrawer {
     });
 
     this.boardTexture = new Texture("sudoku_board.png");
+    this.numberDrawer = new NumberDrawer();
   }
 
   public void draw() {
@@ -51,23 +53,23 @@ public class BoardDrawer {
 
         if (space != null) {
           // Draw the value
-          var value = space.getValue() == null ? "" : space.getValue().toString();
-
-          var spaceX = x * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f - 11;
-          var spaceY = y * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f
-              - this.game.font.getCapHeight() * 0.5f;
-
+          var spaceX = x * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f;
+          var spaceY = y * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f;
           var worldSpace = this.game.camera.unproject(new Vector3(spaceX, spaceY, 0));
 
-          // change de color if the space is not valid
-          if (space.getIsValid()) {
-            this.game.font.setColor(Color.BLACK);
-          } else {
-            this.game.font.setColor(Color.RED);
+          var intValue = space.getValue() == null ? 0 : space.getValue();
+
+          NumberState state = NumberState.NORMAL;
+
+          if (space.getIsFixed()) {
+            state = NumberState.FIXED;
           }
 
-          // draw values
-          this.game.font.draw(this.game.batch, value, worldSpace.x, worldSpace.y);
+          if (!space.getIsValid()) {
+            state = NumberState.INVALID;
+          }
+
+          this.numberDrawer.draw(this.game.batch, intValue, state, worldSpace.x, worldSpace.y);
         }
       }
     }
@@ -99,5 +101,6 @@ public class BoardDrawer {
 
   public void dispose() {
     this.boardTexture.dispose();
+    this.numberDrawer.dispose();
   }
 }
