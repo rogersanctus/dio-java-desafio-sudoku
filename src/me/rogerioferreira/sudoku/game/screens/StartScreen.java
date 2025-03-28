@@ -66,7 +66,10 @@ public class StartScreen implements com.badlogic.gdx.Screen {
 
     var sudokuTitleTextureX = Game.GAME_SCREEN_SIZE * 0.5f - sudokuTitleTexture.getWidth() * 0.5f;
 
-    this.game.batch.draw(this.bgTexture, 0, 0, Game.GAME_SCREEN_SIZE, Game.GAME_SCREEN_SIZE);
+    this.game.batch.draw(
+        this.bgTexture,
+        0, 0,
+        this.bgTexture.getWidth(), this.bgTexture.getHeight());
 
     this.game.batch.draw(this.sudokuTitleTexture, sudokuTitleTextureX,
         Game.GAME_SCREEN_SIZE * 0.5f - sudokuTitleTexture.getHeight());
