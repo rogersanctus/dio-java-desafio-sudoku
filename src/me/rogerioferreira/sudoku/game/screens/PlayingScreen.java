@@ -1,6 +1,7 @@
 package me.rogerioferreira.sudoku.game.screens;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 
 import me.rogerioferreira.sudoku.events.EventMediator;
 import me.rogerioferreira.sudoku.game.Board;
@@ -9,20 +10,21 @@ import me.rogerioferreira.sudoku.game.BoardInputProcessor;
 import me.rogerioferreira.sudoku.game.Game;
 import me.rogerioferreira.sudoku.game.GameState;
 
-public class FixedSpaceAssignmentScreen implements Screen {
+public class PlayingScreen implements Screen {
   private BoardInputProcessor boardInputProcessor;
   private BoardDrawer boardDrawer;
 
-  public FixedSpaceAssignmentScreen(Game game, Board board, EventMediator eventMediator) {
-    System.out.println("FixedSpaceAssignmentScreen created!");
+  public PlayingScreen(Game game, Board board, EventMediator eventMediator) {
+    System.out.println("PlayingScreen created!");
 
-    this.boardInputProcessor = new BoardInputProcessor(board, eventMediator, GameState.FIXED_SPACE_ASSIGNEMENT);
+    this.boardInputProcessor = new BoardInputProcessor(board, eventMediator, GameState.PLAYING);
     this.boardDrawer = new BoardDrawer(game, board, eventMediator);
+    this.boardDrawer.setMouseRectColor(new Color(0, 0, 1, 0.1f));
   }
 
   @Override
   public void show() {
-    System.out.println("FixedSpaceAssignmentScreen opened!");
+    System.out.println("PlayingScreen opened!");
     this.boardInputProcessor.registerAsInputProcessor();
   }
 
@@ -45,7 +47,7 @@ public class FixedSpaceAssignmentScreen implements Screen {
 
   @Override
   public void hide() {
-    System.out.println("FixedSpaceAssignmentScreen closed!");
+    System.out.println("PlayingScreen closed!");
   }
 
   @Override

@@ -209,7 +209,6 @@ public class Board {
 
     // validate region
     var region = this.computeRegion(point);
-    System.out.println("Region: " + region);
 
     this.spaces
         .stream()
@@ -240,5 +239,11 @@ public class Board {
     }
 
     return this.spaces.get(point.x()).get(point.y());
+  }
+
+  public boolean isSpaceFixed(Point point) {
+    var space = this.getSpace(point);
+
+    return space != null && space.getIsFixed();
   }
 }

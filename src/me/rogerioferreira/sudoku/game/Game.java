@@ -1,18 +1,16 @@
 package me.rogerioferreira.sudoku.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import me.rogerioferreira.sudoku.Point;
 import me.rogerioferreira.sudoku.events.EventMediator;
 import me.rogerioferreira.sudoku.events.GameTransitionEvent;
 import me.rogerioferreira.sudoku.game.screens.FixedSpaceAssignmentScreen;
+import me.rogerioferreira.sudoku.game.screens.PlayingScreen;
 import me.rogerioferreira.sudoku.game.screens.StartScreen;
 
 public class Game extends com.badlogic.gdx.Game {
@@ -30,16 +28,15 @@ public class Game extends com.badlogic.gdx.Game {
   private GameState gameState;
 
   private EventMediator eventMediator = new EventMediator();
-  private BoardLogic boardLogic;
 
   private StartScreen startScreen;
   private FixedSpaceAssignmentScreen fixedSpaceAssignmentScreen;
+  private PlayingScreen playingScreen;
 
   public Game() {
     System.out.println("Game created!");
 
     this.board = new Board(Board.DEFAULT_SIZE);
-    this.boardLogic = new BoardLogic(this, this.board, this.eventMediator);
 
     this.eventMediator.addEventListener(event -> {
       switch (event) {
@@ -61,6 +58,9 @@ public class Game extends com.badlogic.gdx.Game {
       }
       case GameState.FIXED_SPACE_ASSIGNEMENT -> {
         this.setScreen(this.fixedSpaceAssignmentScreen);
+      }
+      case GameState.PLAYING -> {
+        this.setScreen(this.playingScreen);
       }
       default -> {
       }
@@ -89,6 +89,7 @@ public class Game extends com.badlogic.gdx.Game {
 
     this.startScreen = new StartScreen(this, this.eventMediator);
     this.fixedSpaceAssignmentScreen = new FixedSpaceAssignmentScreen(this, this.board, this.eventMediator);
+    this.playingScreen = new PlayingScreen(this, this.board, this.eventMediator);
 
     eventMediator.fireEvent(new GameTransitionEvent(GameState.START));
   }
