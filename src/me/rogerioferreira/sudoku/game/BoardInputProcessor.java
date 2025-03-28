@@ -34,8 +34,8 @@ public class BoardInputProcessor {
     var inputProcessor = this;
 
     this.mouseSpacePos = this.computeMouseSpacePos(
-        Gdx.input.getX(),
-        Gdx.input.getY());
+        Gdx.input.getX() - Game.GLOBAL_OFFSET.x(),
+        Gdx.input.getY() - Game.GLOBAL_OFFSET.y());
 
     this.eventMediator.fireEvent(new MouseMoveEvent(this.mouseSpacePos.x(), this.mouseSpacePos.y()));
 
@@ -46,7 +46,9 @@ public class BoardInputProcessor {
           return super.mouseMoved(screenX, screenY);
         }
 
-        inputProcessor.mouseSpacePos = inputProcessor.computeMouseSpacePos(screenX, screenY);
+        inputProcessor.mouseSpacePos = inputProcessor.computeMouseSpacePos(
+            screenX - Game.GLOBAL_OFFSET.x(),
+            screenY - Game.GLOBAL_OFFSET.y());
 
         inputProcessor.eventMediator
             .fireEvent(new MouseMoveEvent(inputProcessor.mouseSpacePos.x(), inputProcessor.mouseSpacePos.y()));
