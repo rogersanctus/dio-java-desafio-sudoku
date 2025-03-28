@@ -43,7 +43,9 @@ public class BoardInputProcessor {
     Gdx.input.setInputProcessor(new InputAdapter() {
       @Override
       public boolean mouseMoved(int screenX, int screenY) {
-        if (inputProcessor.screenGameState != inputProcessor.currentGameState) {
+        if (inputProcessor.screenGameState != inputProcessor.currentGameState ||
+            inputProcessor.currentGameState == GameState.COMPLETED ||
+            inputProcessor.currentGameState == GameState.GIVE_UP) {
           return super.mouseMoved(screenX, screenY);
         }
 
@@ -59,7 +61,20 @@ public class BoardInputProcessor {
 
       @Override
       public boolean keyDown(int keycode) {
-        if (inputProcessor.screenGameState != inputProcessor.currentGameState) {
+        if (keycode == Input.Keys.ESCAPE) {
+          if (inputProcessor.currentGameState == GameState.COMPLETED) {
+            inputProcessor.eventMediator.fireEvent(new GameTransitionEvent(GameState.START));
+          }
+        }
+
+        if (keycode == Input.Keys.T) {
+          inputProcessor.eventMediator.fireEvent(new GameTransitionEvent(GameState.COMPLETED));
+        }
+
+        if (inputProcessor.screenGameState != inputProcessor.currentGameState ||
+            inputProcessor.currentGameState == GameState.COMPLETED ||
+            inputProcessor.currentGameState == GameState.GIVE_UP) {
+
           return false;
         }
 

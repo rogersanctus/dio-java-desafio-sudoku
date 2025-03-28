@@ -75,6 +75,7 @@ public class Board {
     }
 
     this.validateMove(space, point, value);
+    this.totalAssignments++;
 
     return space;
   }
@@ -83,7 +84,8 @@ public class Board {
     var space = this.spaces.get(point.x()).get(point.y());
     var oldValue = space.value;
 
-    space.limpar();
+    space.reset();
+    this.totalAssignments--;
 
     if (oldValue != null) {
       this.revalidateLineValue(point, oldValue);
@@ -244,5 +246,13 @@ public class Board {
     var space = this.getSpace(point);
 
     return space != null && space.getIsFixed();
+  }
+
+  public void reset() {
+    this.spaces.stream()
+        .flatMap(columnSpaces -> columnSpaces.stream())
+        .forEach(space -> space.reset());
+
+    this.totalAssignments = 0;
   }
 }

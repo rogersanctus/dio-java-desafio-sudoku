@@ -38,6 +38,12 @@ public class FixedSpaceAssignmentScreen implements Screen {
     });
   }
 
+  public void reset() {
+    this.hasInvalidAssignments = false;
+    this.showErrorMessage = false;
+    this.errorMessage = null;
+  }
+
   private void processErrorMessageLogic() {
     if (this.showErrorMessage && !this.hasInvalidAssignments) {
       this.showErrorMessage = false;

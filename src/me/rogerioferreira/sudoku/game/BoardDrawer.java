@@ -18,6 +18,8 @@ public class BoardDrawer {
 
   private Texture boardTexture;
   private Texture titleAreaTexture;
+  private Texture gameCompletedTextTexture;
+  private Texture gameCompletedCelebrationPoppers;
   private NumberDrawer numberDrawer;
   private Point offset = Game.GLOBAL_OFFSET;
   private final int LINE_WIDTH = 1;
@@ -40,7 +42,13 @@ public class BoardDrawer {
 
     this.boardTexture = new Texture("sudoku_board.png");
     this.titleAreaTexture = new Texture("title_area.png");
+    this.gameCompletedTextTexture = new Texture("game_completed_text.png");
+    this.gameCompletedCelebrationPoppers = new Texture("game_completed_celebration_poppers.png");
+
     this.boardTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+    this.gameCompletedTextTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+    this.gameCompletedTextTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
     this.numberDrawer = new NumberDrawer();
   }
 
@@ -90,20 +98,40 @@ public class BoardDrawer {
     Gdx.gl.glEnable(GL20.GL_BLEND); // Enable blending for transparency
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-    this.game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+    if (this.game.getGameState() != GameState.COMPLETED) {
+      this.game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-    var spaceSize = Game.SPACE_SIZE + LINE_WIDTH; // Space size + line width
-    var adjustedMouseX = this.mouseXPos * spaceSize + this.offset.x();
-    var adjustedMouseY = this.mouseYPos * spaceSize + this.offset.y();
+      var spaceSize = Game.SPACE_SIZE + LINE_WIDTH; // Space size + line width
+      var adjustedMouseX = this.mouseXPos * spaceSize + this.offset.x();
+      var adjustedMouseY = this.mouseYPos * spaceSize + this.offset.y();
 
-    var adjustedMouseWorldPos = this.game.camera.unproject(new Vector3(adjustedMouseX, adjustedMouseY, 0));
+      var adjustedMouseWorldPos = this.game.camera.unproject(new Vector3(adjustedMouseX, adjustedMouseY, 0));
 
-    this.game.shapeRenderer.setColor(this.MouseSpacePositionColor);
-    this.game.shapeRenderer.rect(adjustedMouseWorldPos.x, adjustedMouseWorldPos.y - Game.SPACE_SIZE,
-        Game.SPACE_SIZE,
-        Game.SPACE_SIZE);
+      this.game.shapeRenderer.setColor(this.MouseSpacePositionColor);
+      this.game.shapeRenderer.rect(adjustedMouseWorldPos.x, adjustedMouseWorldPos.y - Game.SPACE_SIZE,
+          Game.SPACE_SIZE,
+          Game.SPACE_SIZE);
 
-    this.game.shapeRenderer.end();
+      this.game.shapeRenderer.end();
+    }
+
+    if (this.game.getGameState() == GameState.COMPLETED) {
+      this.game.batch.begin();
+
+      this.game.batch.draw(this.gameCompletedTextTexture,
+          Game.GAME_SCREEN_WIDTH * 0.5f - this.gameCompletedTextTexture.getWidth() * 0.5f,
+          Game.GAME_SCREEN_HEIGHT * 0.5f - this.gameCompletedTextTexture.getHeight() * 0.5f,
+          this.gameCompletedTextTexture.getWidth(),
+          this.gameCompletedTextTexture.getHeight());
+
+      this.game.batch.draw(this.gameCompletedCelebrationPoppers,
+          Game.GAME_SCREEN_WIDTH * 0.5f - this.gameCompletedCelebrationPoppers.getWidth() * 0.5f,
+          100,
+          this.gameCompletedCelebrationPoppers.getWidth(),
+          this.gameCompletedCelebrationPoppers.getHeight());
+
+      this.game.batch.end();
+    }
   }
 
   public void setMouseRectColor(Color color) {
@@ -113,6 +141,8 @@ public class BoardDrawer {
   public void dispose() {
     this.boardTexture.dispose();
     this.titleAreaTexture.dispose();
+    this.gameCompletedTextTexture.dispose();
+    this.gameCompletedCelebrationPoppers.dispose();
     this.numberDrawer.dispose();
   }
 }

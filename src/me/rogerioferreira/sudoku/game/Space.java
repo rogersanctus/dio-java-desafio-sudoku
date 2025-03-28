@@ -15,10 +15,10 @@ public class Space {
   private List<Integer> candidateValues = new ArrayList<>();
 
   public Space() {
-    this.limpar();
+    this.reset();
   }
 
-  public void limpar() {
+  public void reset() {
     this.isFixed = false;
     this.isValid = true;
     this.value = null;

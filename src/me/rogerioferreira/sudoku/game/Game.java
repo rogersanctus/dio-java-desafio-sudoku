@@ -15,7 +15,7 @@ import me.rogerioferreira.sudoku.game.screens.PlayingScreen;
 import me.rogerioferreira.sudoku.game.screens.StartScreen;
 
 public class Game extends com.badlogic.gdx.Game {
-  private GameStatus status = GameStatus.UNSTARTED;
+  // private GameStatus status = GameStatus.UNSTARTED;
   private Board board;
 
   public static final int GAME_SCREEN_WIDTH = 800;
@@ -59,6 +59,9 @@ public class Game extends com.badlogic.gdx.Game {
 
     switch (gameState) {
       case GameState.START -> {
+        this.board.reset();
+        this.fixedSpaceAssignmentScreen.reset();
+        this.playingScreen.reset();
         this.setScreen(this.startScreen);
       }
       case GameState.FIXED_SPACE_ASSIGNEMENT -> {
