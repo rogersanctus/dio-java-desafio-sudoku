@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 
 import me.rogerioferreira.sudoku.Point;
+import me.rogerioferreira.sudoku.events.ErrorEvent;
 import me.rogerioferreira.sudoku.events.EventMediator;
 import me.rogerioferreira.sudoku.events.GameTransitionEvent;
 import me.rogerioferreira.sudoku.events.MouseMoveEvent;
@@ -75,7 +76,11 @@ public class BoardInputProcessor {
         }
 
         if (keycode == Input.Keys.ENTER) {
-          eventMediator.fireEvent(new GameTransitionEvent(GameState.PLAYING));
+          if (board.hasInvalidAssignments()) {
+            eventMediator.fireEvent(new ErrorEvent("Impossível avançar com espaços inválidos."));
+          } else {
+            eventMediator.fireEvent(new GameTransitionEvent(GameState.PLAYING));
+          }
         }
 
         return true;
