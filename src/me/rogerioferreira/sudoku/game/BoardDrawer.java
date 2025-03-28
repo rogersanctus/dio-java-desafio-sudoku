@@ -38,6 +38,7 @@ public class BoardDrawer {
     });
 
     this.boardTexture = new Texture("sudoku_board.png");
+    this.boardTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
     this.numberDrawer = new NumberDrawer();
   }
 

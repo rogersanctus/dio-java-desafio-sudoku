@@ -13,9 +13,22 @@ public class NumberDrawer {
 
   public NumberDrawer() {
     for (int i = 1; i <= 9; i++) {
-      this.normalNumbers.add(new Texture("num_" + i + "_normal.png"));
-      this.fixedNumbers.add(new Texture("num_" + i + "_fixed.png"));
-      this.invalidNumbers.add(new Texture("num_" + i + "_invalid.png"));
+      var normalTexture = new Texture("num_" + i + "_normal.png");
+      var fixedTexture = new Texture("num_" + i + "_fixed.png");
+      var invalidTexture = new Texture("num_" + i + "_invalid.png");
+
+      normalTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+      normalTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+      fixedTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+      fixedTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+      invalidTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+      invalidTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+      this.normalNumbers.add(normalTexture);
+      this.fixedNumbers.add(fixedTexture);
+      this.invalidNumbers.add(invalidTexture);
     }
   }
 
