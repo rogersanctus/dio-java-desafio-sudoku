@@ -51,12 +51,11 @@ public class Board {
     }
   }
 
-  private boolean hasInvalidAssignments() {
+  public boolean hasInvalidAssignments() {
     return this.spaces
         .stream()
         .flatMap(columnSpaces -> columnSpaces.stream())
         .anyMatch(space -> !space.getIsValid());
-
   }
 
   public Space assignSpace(boolean isInitial, Point point, int value) {

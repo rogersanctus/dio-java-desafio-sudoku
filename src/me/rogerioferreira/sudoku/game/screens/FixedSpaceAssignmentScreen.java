@@ -10,10 +10,15 @@ import me.rogerioferreira.sudoku.game.Game;
 import me.rogerioferreira.sudoku.game.GameState;
 
 public class FixedSpaceAssignmentScreen implements Screen {
+  private Game game;
+  private Board board;
   private BoardInputProcessor boardInputProcessor;
   private BoardDrawer boardDrawer;
 
   public FixedSpaceAssignmentScreen(Game game, Board board, EventMediator eventMediator) {
+    this.game = game;
+    this.board = board;
+
     System.out.println("FixedSpaceAssignmentScreen created!");
 
     this.boardInputProcessor = new BoardInputProcessor(board, eventMediator, GameState.FIXED_SPACE_ASSIGNEMENT);
@@ -29,6 +34,23 @@ public class FixedSpaceAssignmentScreen implements Screen {
   @Override
   public void render(float delta) {
     this.boardDrawer.draw();
+
+    this.game.batch.begin();
+
+    if (this.board.hasInvalidAssignments()) {
+      this.game.font.setColor(1, 0, 0, 1);
+
+      this.game.font.draw(this.game.batch, "Existe um ou mais valores inválidos.", 10,
+          Game.GAME_SCREEN_SIZE + Game.GLOBAL_OFFSET.y() - 10);
+
+    } else {
+      this.game.font.setColor(0, 1, 0, 1);
+
+      this.game.font.draw(this.game.batch, "Atribua os valores fixos <<ENTER>> para Jogar", 10,
+          Game.GAME_SCREEN_SIZE + Game.GLOBAL_OFFSET.y() - 10);
+    }
+
+    this.game.batch.end();
   }
 
   @Override

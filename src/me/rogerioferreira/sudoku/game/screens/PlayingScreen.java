@@ -11,10 +11,16 @@ import me.rogerioferreira.sudoku.game.Game;
 import me.rogerioferreira.sudoku.game.GameState;
 
 public class PlayingScreen implements Screen {
+  private Game game;
+  private Board board;
+
   private BoardInputProcessor boardInputProcessor;
   private BoardDrawer boardDrawer;
 
   public PlayingScreen(Game game, Board board, EventMediator eventMediator) {
+    this.game = game;
+    this.board = board;
+
     System.out.println("PlayingScreen created!");
 
     this.boardInputProcessor = new BoardInputProcessor(board, eventMediator, GameState.PLAYING);
@@ -31,6 +37,23 @@ public class PlayingScreen implements Screen {
   @Override
   public void render(float delta) {
     this.boardDrawer.draw();
+
+    this.game.batch.begin();
+
+    if (this.board.hasInvalidAssignments()) {
+      this.game.font.setColor(1, 0, 0, 1);
+
+      this.game.font.draw(this.game.batch, "Existe um ou mais valores inválidos.", 10,
+          Game.GAME_SCREEN_SIZE + Game.GLOBAL_OFFSET.y() - 10);
+
+    } else {
+      this.game.font.setColor(0, 1, 0, 1);
+
+      this.game.font.draw(this.game.batch, "Preencha todos os espaços para VENCER!", 10,
+          Game.GAME_SCREEN_SIZE + Game.GLOBAL_OFFSET.y() - 10);
+    }
+
+    this.game.batch.end();
   }
 
   @Override

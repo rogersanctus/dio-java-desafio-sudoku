@@ -17,8 +17,9 @@ public class BoardDrawer {
   private EventMediator eventMediator;
 
   private Texture boardTexture;
+  private Texture titleAreaTexture;
   private NumberDrawer numberDrawer;
-  private int offset = 0;
+  private Point offset = Game.GLOBAL_OFFSET;
   private final int LINE_WIDTH = 1;
 
   private int mouseXPos = 0;
@@ -38,6 +39,7 @@ public class BoardDrawer {
     });
 
     this.boardTexture = new Texture("sudoku_board.png");
+    this.titleAreaTexture = new Texture("title_area.png");
     this.boardTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
     this.numberDrawer = new NumberDrawer();
   }
@@ -45,7 +47,15 @@ public class BoardDrawer {
   public void draw() {
     this.game.batch.begin();
 
-    this.game.batch.draw(this.boardTexture, 0, 0, Game.GAME_SCREEN_SIZE, Game.GAME_SCREEN_SIZE);
+    this.game.batch.draw(this.titleAreaTexture, 0, Game.GAME_SCREEN_SIZE,
+        this.titleAreaTexture.getWidth(),
+        this.titleAreaTexture.getHeight());
+
+    this.game.batch.draw(
+        this.boardTexture,
+        0, 0,
+        this.boardTexture.getWidth(),
+        this.boardTexture.getHeight());
 
     /// Draw the spaces
     for (int x = 0; x < this.board.getSize(); x++) {
@@ -54,8 +64,8 @@ public class BoardDrawer {
 
         if (space != null) {
           // Draw the value
-          var spaceX = x * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f;
-          var spaceY = y * Game.SPACE_SIZE + this.offset + Game.SPACE_SIZE * 0.5f;
+          var spaceX = x * Game.SPACE_SIZE + this.offset.x() + Game.SPACE_SIZE * 0.5f;
+          var spaceY = y * Game.SPACE_SIZE + this.offset.y() + Game.SPACE_SIZE * 0.5f;
           var worldSpace = this.game.camera.unproject(new Vector3(spaceX, spaceY, 0));
 
           var intValue = space.getValue() == null ? 0 : space.getValue();
@@ -83,8 +93,8 @@ public class BoardDrawer {
     this.game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
     var spaceSize = Game.SPACE_SIZE + LINE_WIDTH; // Space size + line width
-    var adjustedMouseX = this.mouseXPos * spaceSize + this.offset;
-    var adjustedMouseY = this.mouseYPos * spaceSize + this.offset;
+    var adjustedMouseX = this.mouseXPos * spaceSize + this.offset.x();
+    var adjustedMouseY = this.mouseYPos * spaceSize + this.offset.y();
 
     var adjustedMouseWorldPos = this.game.camera.unproject(new Vector3(adjustedMouseX, adjustedMouseY, 0));
 
@@ -102,6 +112,7 @@ public class BoardDrawer {
 
   public void dispose() {
     this.boardTexture.dispose();
+    this.titleAreaTexture.dispose();
     this.numberDrawer.dispose();
   }
 }
