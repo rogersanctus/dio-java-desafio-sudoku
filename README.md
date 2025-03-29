@@ -6,6 +6,12 @@
 
 O jogo é feito em Java com a LibGDX.
 
+Estão implementadas três telas:
+
+* Inicial: para iniciar o jogo ou sair
+* Atribuição de valores fixos: para atribuir valores fixos ao tabuleiro
+* Jogo: o jogo em si, para completar todos os espaços do tabuleiro
+
 ## Rodando o projeto:
 
 Se não tiver o gradle instalado, execute o comando abaixo:
