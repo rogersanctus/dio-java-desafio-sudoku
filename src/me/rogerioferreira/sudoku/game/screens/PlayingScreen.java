@@ -24,6 +24,7 @@ public class PlayingScreen implements Screen {
   public PlayingScreen(Game game, Board board, EventMediator eventMediator) {
     this.game = game;
     this.board = board;
+    this.eventMediator = eventMediator;
 
     System.out.println("PlayingScreen created!");
 
