@@ -55,6 +55,10 @@ public class Game extends com.badlogic.gdx.Game {
   }
 
   private void handleGameTransition(GameState gameState) {
+    if (this.gameState == gameState) {
+      return;
+    }
+
     this.gameState = gameState;
 
     switch (gameState) {
