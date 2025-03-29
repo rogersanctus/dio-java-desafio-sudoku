@@ -68,14 +68,17 @@ public class Board {
     space.isFixed = isInitial;
     space.value = value;
 
-    if (oldValue != null && oldValue != value) {
-      this.revalidateLineValue(point, oldValue);
-      this.revalidateColumnValue(point, oldValue);
-      this.revalidateRegion(point, oldValue);
+    if (oldValue == null) {
+      this.totalAssignments++;
+    } else {
+      if (oldValue != value) {
+        this.revalidateLineValue(point, oldValue);
+        this.revalidateColumnValue(point, oldValue);
+        this.revalidateRegion(point, oldValue);
+      }
     }
 
     this.validateMove(space, point, value);
-    this.totalAssignments++;
 
     return space;
   }
@@ -84,14 +87,16 @@ public class Board {
     var space = this.spaces.get(point.x()).get(point.y());
     var oldValue = space.value;
 
+    if (oldValue == null) {
+      return;
+    }
+
     space.reset();
     this.totalAssignments--;
 
-    if (oldValue != null) {
-      this.revalidateLineValue(point, oldValue);
-      this.revalidateColumnValue(point, oldValue);
-      this.revalidateRegion(point, oldValue);
-    }
+    this.revalidateLineValue(point, oldValue);
+    this.revalidateColumnValue(point, oldValue);
+    this.revalidateRegion(point, oldValue);
   }
 
   // Run all the line making revalidations on values with same value that are
